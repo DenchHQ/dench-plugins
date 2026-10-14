@@ -1,7 +1,7 @@
 # Dench plugins and connectors
 
-Official client packages for [Dench](https://dench.com), the AI CRM. Two shared
-skills teach agents to use the Dench CLI and the remote MCP server.
+Official client packages for [Dench](https://dench.com), the AI revenue engine that finds, reaches, and closes customers on its own, and also works as your CRM.
+Two shared skills teach agents to use the Dench CLI and the remote MCP server.
 
 **Private preview.** This repository must stay **PRIVATE** until Mark explicitly
 authorizes otherwise. Nothing here publishes a marketplace listing or changes
@@ -12,9 +12,9 @@ repository visibility. Installers need access to this private repository.
 DNS/TLS, and backend deployment. Packaging validation does **not** establish that
 the production endpoint works. CLI sign-in is independent of this deployment.
 
-> Logo: TODO — approved Dench logo, light/dark variants, and marketplace icon.
-> See [asset placeholders](assets/README.md). No placeholder is advertised as a
-> finished logo in the manifests.
+> Approved Dench workspace icon: [dench-workspace-icon.png](https://www.dench.com/logos/dench-workspace-icon.png) (1024×1024 PNG).
+> The approved base asset is provided; client-specific light/dark variants and
+> size exports remain TODO. See [asset notes](assets/README.md).
 
 ## Contents
 
@@ -192,7 +192,7 @@ The npm package is **`@dench.com/cli`**; its binary is **`dench`**. Select the b
 explicitly because the package has multiple binaries:
 
 ```sh
-npx -y -p @dench.com/cli dench signin --name "AI Agent - Dench CRM"
+npx -y -p @dench.com/cli dench signin --name "AI Agent - Dench"
 npx -y -p @dench.com/cli dench status --mine --json
 npx -y -p @dench.com/cli dench context --json
 npx -y -p @dench.com/cli dench crm entries list task --json
@@ -251,7 +251,8 @@ the client's privacy terms.
 - TODO: approved privacy policy URL, terms URL, support contact/channel, and
   security reporting contact. Until supplied, contact your Dench administrator;
   no guessed addresses or policy links are included.
-- TODO: approved logos/icons, screenshots, listing copy, and reviewer test account.
+- TODO: client-specific logo variants/size exports, screenshots, listing copy,
+  and reviewer test account. The approved base workspace icon is linked above.
 - TODO: approved Codex plugin interface metadata, including display copy, icons,
   and privacy/terms URLs required by the official spec. This is separate from
   the catalog's root `interface.displayName`.

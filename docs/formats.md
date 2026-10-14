@@ -102,5 +102,5 @@ manifests needed by other clients.
 
 Static/schema checks cannot establish account eligibility, directory approval,
 OAuth callback compatibility, or production availability. Privacy/support URLs,
-branding, reviewer credentials, screenshots, and submission approval remain
-release TODOs in the README.
+client-specific logo variants/size exports, reviewer credentials, screenshots,
+and submission approval remain release TODOs in the README.

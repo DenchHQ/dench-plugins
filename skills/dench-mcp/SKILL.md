@@ -1,6 +1,6 @@
 ---
 name: dench-mcp
-description: Use Dench remote MCP tools to search and update CRM records, inspect workspace context, manage notes and tasks, or manage outreach through an OAuth-authorized workspace with explicit approval.
+description: Use Dench remote MCP tools to find leads, run outreach, manage CRM records and tasks, inspect workspace context, or perform approved connected-app actions through an OAuth-authorized workspace.
 ---
 
 # Dench MCP

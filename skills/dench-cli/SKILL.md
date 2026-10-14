@@ -1,6 +1,6 @@
 ---
 name: dench-cli
-description: Use the Dench CLI to connect an AI CRM workspace, inspect CRM objects and records, manage tasks, or access connected apps when the user asks to work in Dench from a terminal.
+description: Use the Dench CLI to connect a Dench workspace, find leads, run outreach, manage CRM records and tasks, or use connected apps from a terminal.
 ---
 
 # Dench CLI
@@ -31,7 +31,7 @@ the user can pin an approved package version after `@dench.com/cli`.
 3. If no suitable session exists, run:
 
    ```sh
-   npx -y -p @dench.com/cli dench signin --name "AI Agent - Dench CRM"
+   npx -y -p @dench.com/cli dench signin --name "AI Agent - Dench"
    ```
 
    Optionally add `--kind cursor`, `--kind claude_code`, `--kind codex`, or a
