@@ -1,0 +1,8 @@
+{
+  "name": "dench",
+  "version": "0.1.0",
+  "description": "Connect Dench, the AI revenue engine and CRM, so your agent can find leads, run outreach, and manage your pipeline.",
+  "mcpServers": {
+    "dench": { "httpUrl": "https://mcp.dench.com/mcp" }
+  }
+}

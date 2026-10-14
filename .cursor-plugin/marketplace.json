@@ -1,0 +1,12 @@
+{
+  "name": "dench-plugins",
+  "owner": { "name": "DenchHQ" },
+  "metadata": { "description": "Official Dench plugins and connectors." },
+  "plugins": [
+    {
+      "name": "dench",
+      "source": "./",
+      "description": "Dench AI revenue engine skills and remote MCP connector."
+    }
+  ]
+}
