@@ -43,12 +43,22 @@ assert.equal(base.repository, 'https://github.com/DenchHQ/dench-plugins');
 assert.deepEqual(base.author, { name: 'DenchHQ' });
 assert(base.description.length > 0);
 assert(base.keywords.every((keyword) => typeof keyword === 'string'));
+const cursorAuthor = { ...base.author, email: 'support@dench.com' };
 
 for (const client of ['claude', 'cursor', 'codex']) {
   const path = `.${client}-plugin/plugin.json`;
   const manifest = json(path);
-  keys(manifest, client === 'claude' ? metadataKeys : [...metadataKeys, 'skills', 'mcpServers'], path);
-  for (const key of metadataKeys) assert.deepEqual(manifest[key], base[key], `${path}: ${key}`);
+  const allowed = client === 'claude' ? metadataKeys : [...metadataKeys, 'skills', 'mcpServers'];
+  keys(manifest, client === 'cursor' ? [...allowed, 'displayName', 'logo'] : allowed, path);
+  for (const key of metadataKeys) {
+    const expected = client === 'cursor' && key === 'author' ? cursorAuthor : base[key];
+    assert.deepEqual(manifest[key], expected, `${path}: ${key}`);
+  }
+  if (client === 'cursor') {
+    assert.equal(manifest.displayName, 'Dench');
+    assert.equal(manifest.logo, 'assets/logo.png');
+    component(`./${manifest.logo}`);
+  }
   if (client !== 'claude') {
     assert.equal(manifest.skills, './skills/');
     assert.equal(manifest.mcpServers, './.mcp.json');
@@ -79,7 +89,7 @@ for (const client of ['claude', 'cursor']) {
     path,
   );
   assert.equal(marketplace.name, 'dench-plugins');
-  assert.deepEqual(marketplace.owner, { name: 'DenchHQ' });
+  assert.deepEqual(marketplace.owner, client === 'cursor' ? cursorAuthor : base.author);
   if (client === 'claude') {
     assert.equal(marketplace.description, 'Official Dench plugins and connectors.');
   } else {

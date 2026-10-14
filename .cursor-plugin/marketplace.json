@@ -1,6 +1,6 @@
 {
   "name": "dench-plugins",
-  "owner": { "name": "DenchHQ" },
+  "owner": { "name": "DenchHQ", "email": "support@dench.com" },
   "metadata": { "description": "Official Dench plugins and connectors." },
   "plugins": [
     {
