@@ -107,6 +107,9 @@ On a version with plugin marketplace support, add the local catalog:
 codex plugin marketplace add /absolute/path/to/dench
 ```
 
+The catalog sets `interface.displayName` to `Dench` in its root `interface`
+object, not on a plugin entry.
+
 Use the supported plugin browser to select `dench` from `dench-plugins`, install
 it, and complete OAuth. The official packaging guide recommends the desktop app
 for local plugin installation/testing. Client availability varies by version;
@@ -251,7 +254,7 @@ the client's privacy terms.
 - TODO: approved logos/icons, screenshots, listing copy, and reviewer test account.
 - TODO: approved Codex plugin interface metadata, including display copy, icons,
   and privacy/terms URLs required by the official spec. This is separate from
-  the `displayName` on the Codex marketplace catalog.
+  the catalog's root `interface.displayName`.
 - Cursor's public marketplace requires an open-source plugin, so public listing
   is blocked while this repository is private. Continue to use only approved
   local/private-team installs; do not change repository visibility.

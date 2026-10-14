@@ -95,7 +95,7 @@ for (const client of ['claude', 'cursor']) {
 }
 assert.deepEqual(json('.agents/plugins/marketplace.json'), {
   name: 'dench-plugins',
-  displayName: 'Dench',
+  interface: { displayName: 'Dench' },
   plugins: [{
     name: base.name,
     source: { source: 'local', path: './' },

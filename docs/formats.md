@@ -14,7 +14,7 @@ are references, not invented Dench listing or support URLs.
 | Claude Code plugin | [Manifest reference](https://code.claude.com/docs/en/plugins/manifest-reference), [plugins reference](https://code.claude.com/docs/en/plugins-reference) | Standard skills and `.mcp.json` auto-discovery; no duplicate explicit discovery paths |
 | Claude Code marketplace | [Marketplace guide](https://code.claude.com/docs/en/plugin-marketplaces) | Relative `./` source is the repository root; top-level `description` is supported and `metadata.description` is backward-compatible |
 | Claude Code MCP | [MCP servers](https://code.claude.com/docs/en/mcp-servers) | `type: http`, browser OAuth |
-| Codex plugin and catalog | [Package your plugin](https://developers.openai.com/plugins/build/plugins), [sample spec](https://github.com/openai/codex/blob/main/codex-rs/skills/src/assets/samples/plugin-creator/references/plugin-json-spec.md) | Supported `.codex-plugin` compatibility layout; catalog-level `displayName` belongs at the marketplace root, not on an entry |
+| Codex plugin and catalog | [Package your plugin](https://developers.openai.com/plugins/build/plugins), [sample spec](https://github.com/openai/codex/blob/main/codex-rs/skills/src/assets/samples/plugin-creator/references/plugin-json-spec.md) | Supported `.codex-plugin` compatibility layout; catalog `interface.displayName` belongs in the root `interface` object, not on a plugin entry |
 | Codex MCP | [MCP](https://developers.openai.com/codex/mcp), [CLI add example](https://developers.openai.com/learn/docs-mcp) | Manual MCP-only fallback for clients without plugin support |
 | Gemini extension / skills | [Extension reference](https://geminicli.com/docs/extensions/reference/) | Root `gemini-extension.json`, `skills/` discovery |
 | Gemini MCP / OAuth | [MCP servers](https://geminicli.com/docs/tools/mcp-server/) | `httpUrl` for Streamable HTTP; automatic OAuth discovery; no `trust` bypass |
@@ -91,8 +91,7 @@ create/delete production data as a packaging test.
 ChatGPT desktop clients that discover both `.claude-plugin/marketplace.json` and
 `.agents/plugins/marketplace.json` may show Dench twice. The catalogs describe
 the same root package; deduplication is not assumed. This behavior has **not**
-been tested in this Linux environment; no supported desktop app or browser
-automation was available.
+been tested in this Linux environment; no supported desktop app was available.
 
 For a supported desktop app, restart it with this repository available, inspect
 the configured marketplace sources and Dench listings, and record the app
