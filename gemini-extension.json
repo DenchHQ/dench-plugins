@@ -1,0 +1,8 @@
+{
+  "name": "dench",
+  "version": "0.1.0",
+  "description": "Connect your Dench AI CRM workspace through MCP and the Dench CLI.",
+  "mcpServers": {
+    "dench": { "httpUrl": "https://mcp.dench.com/mcp" }
+  }
+}

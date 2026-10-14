@@ -1,0 +1,12 @@
+{
+  "name": "dench",
+  "version": "0.1.0",
+  "description": "Connect your Dench AI CRM workspace through MCP and the Dench CLI.",
+  "author": { "name": "DenchHQ" },
+  "homepage": "https://dench.com",
+  "repository": "https://github.com/DenchHQ/dench-plugins",
+  "license": "MIT",
+  "keywords": ["dench", "crm", "mcp"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}
