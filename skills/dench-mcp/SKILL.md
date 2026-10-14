@@ -1,6 +1,6 @@
 ---
 name: dench-mcp
-description: Use Dench remote MCP tools to search and update CRM records, inspect workspace context, manage notes and tasks, or perform approved connected-app actions through an OAuth-authorized workspace.
+description: Use Dench remote MCP tools to search and update CRM records, inspect workspace context, manage notes and tasks, or manage outreach through an OAuth-authorized workspace with explicit approval.
 ---
 
 # Dench MCP
@@ -31,19 +31,28 @@ and client ID metadata documents (CIMD). Request the least privilege needed:
 
 | Scope | Available capabilities |
 | --- | --- |
-| `dench:read` | Workspace context/rules, objects/fields, records, notes/activity, tasks, memory search, approval reads, `search` and `fetch` (15 tools) |
-| `dench:write` | Create/update records, add notes, create/complete tasks, save memory, replace workspace rules, request approval (8 tools) |
-| `dench:actions` | `list_connected_apps`, `search_actions`, `run_action` (3 tools) |
+| `dench:read` | Workspace context/rules, objects/fields, records, notes/activity, tasks, memory search, approval reads, `search` and `fetch` |
+| `dench:write` | Create/update records, add notes, create/complete tasks, save memory, replace workspace rules, request approval |
+| `dench:actions` | Discover connected apps and run their actions |
+| `dench:outreach` | Opt-in campaign management, email sending, and inbox reads |
 
-Read scope is required; write/actions are optional on the consent screen. Missing
-tools can mean missing scopes, not a broken installation. Ask the human to
-re-authorize when more access is genuinely needed. Do not bypass narrowed consent
-by switching credentials, clients, or the CLI.
+`dench:read` is required; `dench:write`, `dench:actions`, and `dench:outreach`
+are optional consent choices. The outreach scope is available only after a
+server release exposes it; Dench MCP PR #1273 is adding it. Use the live
+`tools/list` response and each tool's live input schema to determine the
+capabilities granted by the current server release. Missing tools can mean
+missing scopes or a server version that does not expose them, not a broken
+installation. Ask the human to re-authorize when more access is genuinely needed.
+Do not bypass narrowed consent by switching credentials, clients, or the CLI.
 
 ## Mutations and approvals
 
 - Read-only access is the starting point. Confirm the intended target and change
   before a mutation; CRM, memory, and rules writes have no automatic human gate.
+- Before sending email or launching a campaign, obtain explicit user approval
+  for the exact senders, recipients, and content. Read the live launch preview
+  before launching. Never fabricate a required LinkedIn risk acknowledgement;
+  obtain the actual human acknowledgement when required.
 - `set_workspace_rules` **replaces** the rules. Read the current rules and get
   explicit confirmation of the replacement before calling it.
 - Discover the connected app and action schema before `run_action`. External

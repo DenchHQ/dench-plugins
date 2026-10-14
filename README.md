@@ -34,26 +34,28 @@ for the CLI skill, not remote MCP.
 ## Private installation
 
 Use authenticated Git access without embedding a token in the clone URL. Review
-the plugin files before enabling them. These commands deliberately use the review
-branch while `main` contains only the original README:
+the plugin files before enabling them. After PR #1 merges, `main` is the default
+install. Reviewers installing before then can select the PR ref explicitly. The
+checkout directory is named `dench`, which also matches Gemini CLI's extension
+name requirement:
 
 ```sh
-git clone --branch feat/initial-plugins https://github.com/DenchHQ/dench-plugins.git
-cd dench-plugins
+git clone --branch main https://github.com/DenchHQ/dench-plugins.git dench
+cd dench
 ```
 
-Once Mark merges a release, use its approved ref instead. The examples below use
-`/absolute/path/to/dench-plugins` as a placeholder for this checkout. Do not install
-the same MCP server through both a plugin and a manual client config.
+The examples below use `/absolute/path/to/dench` as a placeholder for this
+checkout. Do not install the same MCP server through both a plugin and a manual
+client config.
 
 ### Cursor
 
-For a local plugin, clone the review branch into Cursor's local plugin directory
+For a local plugin, clone `main` into Cursor's local plugin directory
 (if `dench` already exists, update that checkout rather than overwriting it):
 
 ```sh
 mkdir -p ~/.cursor/plugins/local
-git clone --branch feat/initial-plugins https://github.com/DenchHQ/dench-plugins.git ~/.cursor/plugins/local/dench
+git clone --branch main https://github.com/DenchHQ/dench-plugins.git ~/.cursor/plugins/local/dench
 ```
 
 Restart Cursor or run **Developer: Reload Window**. Verify the `dench-cli` and
@@ -74,13 +76,13 @@ other servers. This does not install the skills.
 Load the checked-out plugin directly for review:
 
 ```sh
-claude --plugin-dir /absolute/path/to/dench-plugins
+claude --plugin-dir /absolute/path/to/dench
 ```
 
 Or register the local marketplace inside Claude Code:
 
 ```text
-/plugin marketplace add /absolute/path/to/dench-plugins
+/plugin marketplace add /absolute/path/to/dench
 /plugin install dench@dench-plugins
 ```
 
@@ -102,7 +104,7 @@ Then run `/mcp` in Claude Code and follow browser authorization.
 On a version with plugin marketplace support, add the local catalog:
 
 ```sh
-codex plugin marketplace add /absolute/path/to/dench-plugins
+codex plugin marketplace add /absolute/path/to/dench
 ```
 
 Use the supported plugin browser to select `dench` from `dench-plugins`, install
@@ -122,10 +124,11 @@ This fallback does not load plugin skills. Use `/mcp` to inspect the connection.
 
 ### Gemini CLI
 
-Link the local checkout for review:
+Link the local checkout. Its directory name must be `dench`, matching the
+extension's manifest name:
 
 ```sh
-gemini extensions link /absolute/path/to/dench-plugins
+gemini extensions link /absolute/path/to/dench
 gemini extensions list
 ```
 
@@ -133,7 +136,7 @@ Restart Gemini CLI. Check `/skills list` and `/mcp`; if authentication is needed
 run `/mcp auth dench` and complete the browser flow. The extension uses `httpUrl`
 (Streamable HTTP), not Gemini's SSE `url` field. OAuth discovery needs no embedded
 client secret. For a fixed local installation rather than a live development
-link, use `gemini extensions install /absolute/path/to/dench-plugins`.
+link, use `gemini extensions install /absolute/path/to/dench`.
 
 ### Claude (web/desktop connector)
 
@@ -152,6 +155,11 @@ workspace and test in a new conversation. UI labels can vary by rollout.
 This is a developer connector, **not** an approved ChatGPT directory listing.
 No legacy `ai-plugin.json` is supplied: current Apps SDK integration is through
 the remote MCP server, with submission metadata/review handled separately.
+
+ChatGPT desktop clients that discover both `.claude-plugin/marketplace.json` and
+`.agents/plugins/marketplace.json` may show Dench twice. These catalogs describe
+the same root package; do not install or authorize both listings, and do not
+assume the client deduplicates them.
 
 ### Grok
 
@@ -204,14 +212,28 @@ for selection and safety rules.
 - Endpoint: `https://mcp.dench.com/mcp`; transport: **Streamable HTTP**.
 - OAuth 2.1: DCR + CIMD, PKCE S256, rotating refresh tokens. Let clients discover
   metadata; no shared client secret or hard-coded bearer header is needed.
-- `dench:read`: 15 tools; `dench:write`: 8 tools; `dench:actions`: 3 tools.
-  Read is required; write/actions are optional consent choices. All 26 tools
-  appear only with all scopes. There are no delete or approval-decision tools.
+- `dench:read`: workspace context and rules, CRM records and metadata,
+  notes/activity, tasks, memory search, approval reads, and knowledge search.
+- `dench:write`: create/update records, add notes, create/complete tasks, save
+  memory, replace workspace rules, and request approvals.
+- `dench:actions`: discover connected apps and run their actions.
+- `dench:outreach`: opt-in campaign management, email sending, and inbox reads.
+  This scope is available only after a server release exposes it; Dench MCP
+  PR #1273 is adding the scope.
+- `dench:read` is required; `dench:write`, `dench:actions`, and
+  `dench:outreach` are optional consent choices. Inspect the live `tools/list`
+  response and each tool's live input schema to determine the capabilities
+  granted by the current server release. There are no delete or
+  approval-decision tools.
 - The grant is bound to one workspace. CLI sign-in does not grant MCP access and
   vice versa. Neither should bypass the other's consent.
 - **Writes can change live CRM data without a separate human-approval gate.**
   Workspace rules are replaced, not appended. External actions preserve Dench's
   approval policy. Start read-only and review intended changes.
+- Before sending email or launching a campaign, obtain explicit user approval
+  for the exact senders, recipients, and content. Read the live launch preview
+  before launching. Never fabricate a required LinkedIn risk acknowledgement;
+  obtain the actual human acknowledgement when required.
 - Revoke a grant in **Dench → Settings → API keys → Connected AI apps**. Removing
   a plugin or disconnecting a client may not revoke its server-side grant.
 
@@ -227,9 +249,16 @@ the client's privacy terms.
   security reporting contact. Until supplied, contact your Dench administrator;
   no guessed addresses or policy links are included.
 - TODO: approved logos/icons, screenshots, listing copy, and reviewer test account.
+- TODO: approved Codex plugin interface metadata, including display copy, icons,
+  and privacy/terms URLs required by the official spec. This is separate from
+  the `displayName` on the Codex marketplace catalog.
+- Cursor's public marketplace requires an open-source plugin, so public listing
+  is blocked while this repository is private. Continue to use only approved
+  local/private-team installs; do not change repository visibility.
 - TODO: merge/deploy the MCP server, configure DNS/TLS, and verify OAuth discovery,
   consent, refresh, revocation, narrowed scopes, and approval-gated actions with
-  each target client.
+  each target client, including the desktop catalog acceptance test in
+  [docs/formats.md](docs/formats.md).
 - TODO: Mark's explicit authorization before any public release, repository
   visibility change, or directory submission. Do not publish this preview.
 
@@ -237,15 +266,15 @@ the client's privacy terms.
 
 ```sh
 node scripts/validate.mjs
-node --check scripts/validate.mjs
 git diff --check
 claude plugin validate .
-claude plugin validate .claude-plugin/plugin.json
+claude plugin validate .claude-plugin/marketplace.json
 ```
 
 The first command is dependency-free repository consistency validation, **not**
-an official cross-client schema validator. CI runs it plus JavaScript syntax and
-whitespace checks. The Claude commands require Claude Code. Official format
+an official cross-client schema validator. CI runs it plus a whitespace check;
+running the script with Node also parses its JavaScript. The Claude commands
+require Claude Code. Official format
 sources, schema validation instructions, and validation boundaries are in
 [docs/formats.md](docs/formats.md). There is no compiled application or TypeScript
 build. Live OAuth/client acceptance testing remains a release prerequisite.

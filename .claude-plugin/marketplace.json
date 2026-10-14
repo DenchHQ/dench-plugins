@@ -1,7 +1,7 @@
 {
   "name": "dench-plugins",
+  "description": "Official Dench plugins and connectors.",
   "owner": { "name": "DenchHQ" },
-  "metadata": { "description": "Official Dench plugins and connectors." },
   "plugins": [
     {
       "name": "dench",

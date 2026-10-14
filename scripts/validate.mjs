@@ -71,9 +71,21 @@ assert.deepEqual(gemini, {
 for (const client of ['claude', 'cursor']) {
   const path = `.${client}-plugin/marketplace.json`;
   const marketplace = json(path);
-  keys(marketplace, ['name', 'owner', 'metadata', 'plugins'], path);
+  keys(
+    marketplace,
+    client === 'claude'
+      ? ['name', 'description', 'owner', 'plugins']
+      : ['name', 'owner', 'metadata', 'plugins'],
+    path,
+  );
   assert.equal(marketplace.name, 'dench-plugins');
   assert.deepEqual(marketplace.owner, { name: 'DenchHQ' });
+  if (client === 'claude') {
+    assert.equal(marketplace.description, 'Official Dench plugins and connectors.');
+  } else {
+    keys(marketplace.metadata, ['description'], `${path}: metadata`);
+    assert.equal(marketplace.metadata.description, 'Official Dench plugins and connectors.');
+  }
   assert.equal(marketplace.plugins.length, 1);
   const entry = marketplace.plugins[0];
   keys(entry, ['name', 'source', 'description'], path);
@@ -83,6 +95,7 @@ for (const client of ['claude', 'cursor']) {
 }
 assert.deepEqual(json('.agents/plugins/marketplace.json'), {
   name: 'dench-plugins',
+  displayName: 'Dench',
   plugins: [{
     name: base.name,
     source: { source: 'local', path: './' },

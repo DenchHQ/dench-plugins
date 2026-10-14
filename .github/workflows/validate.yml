@@ -17,5 +17,4 @@ jobs:
         with:
           node-version: '22'
       - run: node scripts/validate.mjs
-      - run: node --check scripts/validate.mjs
       - run: git diff --check

@@ -1,5 +1,6 @@
 {
   "name": "dench-plugins",
+  "displayName": "Dench",
   "plugins": [
     {
       "name": "dench",
