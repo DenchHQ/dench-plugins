@@ -1,9 +1,4 @@
-# Branding assets
+# Assets
 
-Approved base asset:
-
-- Dench workspace icon: [PNG](https://www.dench.com/logos/dench-workspace-icon.png), 1024×1024.
-
-Client-specific light/dark variants and size exports remain TODO; confirm each
-client's requirements before submission. Client screenshots are also TODO. The
-approved base icon is linked, not bundled in this repository.
+- `logo.png`: Dench workspace icon, 1024×1024 PNG. Used as the Cursor plugin
+  logo (`.cursor-plugin/plugin.json`).

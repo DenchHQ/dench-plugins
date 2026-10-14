@@ -1,290 +1,127 @@
-# Dench plugins and connectors
+# Dench
 
-Official client packages for [Dench](https://dench.com), the AI revenue engine that finds, reaches, and closes customers on its own, and also works as your CRM.
-Two shared skills teach agents to use the Dench CLI and the remote MCP server.
+[Dench](https://dench.com) is an AI revenue engine that finds, reaches, and
+closes customers, and also works as your CRM.
 
-**Private preview.** This repository must stay **PRIVATE** until Mark explicitly
-authorizes otherwise. Nothing here publishes a marketplace listing or changes
-repository visibility. Installers need access to this private repository.
+This plugin connects your AI agent to your Dench workspace. Once it's installed,
+your agent can:
 
-**MCP deployment prerequisite:** the endpoint below depends on the not-yet-merged
-[Dench MCP server PR](https://github.com/DenchHQ/dench.com/pull/1273), production
-DNS/TLS, and backend deployment. Packaging validation does **not** establish that
-the production endpoint works. CLI sign-in is independent of this deployment.
+- Look up and update people, companies, deals, tasks, and custom records.
+- Read workspace context, notes, activity, and memory.
+- Find leads and manage outreach campaigns.
+- Run actions in the apps you've connected to Dench.
 
-> Approved Dench workspace icon: [dench-workspace-icon.png](https://www.dench.com/logos/dench-workspace-icon.png) (1024×1024 PNG).
-> The approved base asset is provided; client-specific light/dark variants and
-> size exports remain TODO. See [asset notes](assets/README.md).
+The plugin contains two skills, [`dench-mcp`](skills/dench-mcp/SKILL.md) and
+[`dench-cli`](skills/dench-cli/SKILL.md), plus the Dench server connection.
+It ships no executables, install hooks, or credentials.
 
-## Contents
-
-| Client | Package |
-| --- | --- |
-| Cursor | `.cursor-plugin/plugin.json`, `.cursor-plugin/marketplace.json`; explicit shared `.mcp.json` path |
-| Claude Code | `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`; auto-discovers `.mcp.json` and `skills/` |
-| Codex | `.codex-plugin/plugin.json` (supported compatibility format), `.agents/plugins/marketplace.json` |
-| Gemini CLI | `gemini-extension.json`; native `httpUrl` transport and shared `skills/` discovery |
-| Claude, ChatGPT, Grok, Muse | Remote connector setup/status below; not claimed to be listed |
-
-Skills: [`dench-cli`](skills/dench-cli/SKILL.md) and
-[`dench-mcp`](skills/dench-mcp/SKILL.md). There are no bundled executables, install
-hooks, credentials, or local MCP proxy. Node.js 20+ and npm/npx are required only
-for the CLI skill, not remote MCP.
-
-## Private installation
-
-Use authenticated Git access without embedding a token in the clone URL. Review
-the plugin files before enabling them. After PR #1 merges, `main` is the default
-install. Reviewers installing before then can select the PR ref explicitly. The
-checkout directory is named `dench`, which also matches Gemini CLI's extension
-name requirement:
-
-```sh
-git clone --branch main https://github.com/DenchHQ/dench-plugins.git dench
-cd dench
-```
-
-The examples below use `/absolute/path/to/dench` as a placeholder for this
-checkout. Do not install the same MCP server through both a plugin and a manual
-client config.
+## Install
 
 ### Cursor
 
-For a local plugin, clone `main` into Cursor's local plugin directory
-(if `dench` already exists, update that checkout rather than overwriting it):
+Install **Dench** from the Cursor Marketplace.
+
+To install from source instead, clone this repository into Cursor's local
+plugin directory, then restart Cursor or run **Developer: Reload Window**:
 
 ```sh
 mkdir -p ~/.cursor/plugins/local
-git clone --branch main https://github.com/DenchHQ/dench-plugins.git ~/.cursor/plugins/local/dench
+git clone https://github.com/DenchHQ/dench-plugins.git ~/.cursor/plugins/local/dench
 ```
-
-Restart Cursor or run **Developer: Reload Window**. Verify the `dench-cli` and
-`dench-mcp` skills and the Dench MCP server are available. Use the server's
-authentication/connect control to authorize with Dench in your browser.
-
-For a private team marketplace, an admin can use **Dashboard → Plugins & MCPs →
-Team Marketplaces → Add Marketplace → Import from Repo**, select this repository
-and the intended ref, and review marketplace access before enabling it. Keep
-distribution restricted to the authorized review team; do not submit publicly.
-
-MCP-only alternative: merge the `mcpServers.dench` entry from `.mcp.json` into
-your existing `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (user). Preserve
-other servers. This does not install the skills.
 
 ### Claude Code
 
-Load the checked-out plugin directly for review:
-
-```sh
-claude --plugin-dir /absolute/path/to/dench
-```
-
-Or register the local marketplace inside Claude Code:
-
 ```text
-/plugin marketplace add /absolute/path/to/dench
+/plugin marketplace add DenchHQ/dench-plugins
 /plugin install dench@dench-plugins
 ```
 
-After an approved merge, repository-access holders can register
-`/plugin marketplace add DenchHQ/dench-plugins` instead. Use `/mcp` to authenticate
-the plugin-provided server. Skills are namespaced as `/dench:dench-cli` and
-`/dench:dench-mcp`.
+Then run `/mcp` to sign in. Skills appear as `/dench:dench-mcp` and
+`/dench:dench-cli`.
 
-MCP-only alternative (no plugin skills):
+### Codex and Gemini CLI
 
-```sh
-claude mcp add --transport http dench https://mcp.dench.com/mcp
-```
-
-Then run `/mcp` in Claude Code and follow browser authorization.
-
-### Codex
-
-On a version with plugin marketplace support, add the local catalog:
+Clone the repository into a directory named `dench`, then add it:
 
 ```sh
-codex plugin marketplace add /absolute/path/to/dench
+git clone https://github.com/DenchHQ/dench-plugins.git dench
+codex plugin marketplace add "$PWD/dench"   # Codex
+gemini extensions install "$PWD/dench"      # Gemini CLI
 ```
 
-The catalog sets `interface.displayName` to `Dench` in its root `interface`
-object, not on a plugin entry.
+In Codex, install `dench` from the plugin browser. In Gemini CLI, restart and
+run `/mcp auth dench` if asked to sign in.
 
-Use the supported plugin browser to select `dench` from `dench-plugins`, install
-it, and complete OAuth. The official packaging guide recommends the desktop app
-for local plugin installation/testing. Client availability varies by version;
-check `codex plugin --help`. The `.codex-plugin` compatibility layout is
-intentional; it shares the same skills and MCP file as the other clients.
+### Other clients
 
-For versions without plugin support, use the documented MCP-only path:
+Any client that supports remote MCP servers with OAuth (for example Claude or
+ChatGPT custom connectors) can add `https://mcp.dench.com/mcp` directly. This
+adds the Dench tools but not the skills. Don't add the server both this way and
+through the plugin.
 
-```sh
-codex mcp add dench --url https://mcp.dench.com/mcp
-codex mcp login dench
-```
+## Sign in
 
-This fallback does not load plugin skills. Use `/mcp` to inspect the connection.
+Dench uses OAuth, so there are no API keys or tokens to paste into your
+config. The server is `https://mcp.dench.com/mcp` (Streamable HTTP).
 
-### Gemini CLI
+The first time your agent connects, your client opens Dench in the browser.
+Choose a workspace and what the agent may do:
 
-Link the local checkout. Its directory name must be `dench`, matching the
-extension's manifest name:
+- **Read** (always on): workspace context, CRM records, notes, tasks, and memory.
+- **Write** (optional): create and update records, notes, tasks, and memory.
+- **Actions** (optional): run actions in your connected apps.
+- **Outreach** (optional, off by default): manage campaigns and send email.
 
-```sh
-gemini extensions link /absolute/path/to/dench
-gemini extensions list
-```
+In Cursor, use the Dench server's connect button in MCP settings if the browser
+doesn't open on its own.
 
-Restart Gemini CLI. Check `/skills list` and `/mcp`; if authentication is needed,
-run `/mcp auth dench` and complete the browser flow. The extension uses `httpUrl`
-(Streamable HTTP), not Gemini's SSE `url` field. OAuth discovery needs no embedded
-client secret. For a fixed local installation rather than a live development
-link, use `gemini extensions install /absolute/path/to/dench`.
+Each sign-in covers one workspace. To revoke access, go to **Dench → Settings →
+API keys → Connected AI apps**. Uninstalling the plugin does not revoke it.
 
-### Claude (web/desktop connector)
+## Approvals
 
-Where custom connectors are enabled for your account, use **Settings → Connectors
-→ Add custom connector**, enter `https://mcp.dench.com/mcp`, and authorize Dench.
-This installs neither the Claude Code plugin nor its CLI skill. A directory
-listing is separate and remains TODO.
+Sending email, adding people to a campaign, launching or resuming a campaign,
+and any connected-app action that changes something go through Dench approvals.
+The agent's first attempt only creates a request; nothing runs until you
+approve it in Dench, and each approval is good for one run. There are no delete
+tools, and the agent cannot approve its own requests.
 
-### ChatGPT apps / connectors
+CRM edits (records, notes, tasks, memory) apply right away. Leave **Write**
+unchecked if you want read-only access.
 
-Where your plan and admin policy permit, enable developer mode under **Settings
-→ Apps & Connectors → Advanced settings**, then create a connector with the MCP
-URL `https://mcp.dench.com/mcp` and OAuth authentication. Authorize the intended
-workspace and test in a new conversation. UI labels can vary by rollout.
+## Dench CLI
 
-This is a developer connector, **not** an approved ChatGPT directory listing.
-No legacy `ai-plugin.json` is supplied: current Apps SDK integration is through
-the remote MCP server, with submission metadata/review handled separately.
-
-ChatGPT desktop clients that discover both `.claude-plugin/marketplace.json` and
-`.agents/plugins/marketplace.json` may show Dench twice. These catalogs describe
-the same root package; do not install or authorize both listings, and do not
-assume the client deduplicates them.
-
-### Grok
-
-For **Grok Build**, official MCP documentation supports:
-
-```sh
-grok mcp add --transport http dench https://mcp.dench.com/mcp
-```
-
-Complete the browser OAuth flow when requested. This is not a claim of support
-or listing in the consumer Grok app. The xAI API also supports remote MCP, but its
-request configuration and token handling belong in the calling application, not
-in a public plugin manifest. TODO: confirm the desired Grok surface, directory
-submission path, and client-specific OAuth compatibility.
-
-### Muse
-
-TODO: confirm Muse's developer/partner submission process, Dench OAuth
-compatibility, and any official package format. Meta documents connectors, but
-we have not verified a public installable manifest standard or a Dench listing.
-The integration target is `https://mcp.dench.com/mcp`; do not invent a marketplace
-URL or ask users to paste access tokens into a conversation.
-
-## CLI quick start
-
-The npm package is **`@dench.com/cli`**; its binary is **`dench`**. Select the binary
-explicitly because the package has multiple binaries:
+The `dench-cli` skill uses the published `@dench.com/cli` package (Node.js 20+):
 
 ```sh
 npx -y -p @dench.com/cli dench signin --name "AI Agent - Dench"
 npx -y -p @dench.com/cli dench status --mine --json
-npx -y -p @dench.com/cli dench context --json
-npx -y -p @dench.com/cli dench crm entries list task --json
 ```
 
-The human approves sign-in in the browser with the intended workspace selected.
-If sessions already exist, first run `dench sessions` using the same npx prefix;
-select with `dench use <session-key-or-workspace-slug>` rather than guessing.
-Tasks are CRM entries; there is no `dench tasks` command.
+You approve the sign-in in the browser. CLI sign-in and the plugin's OAuth
+sign-in are separate; neither grants the other.
 
-Normal local sign-in requires **no environment variables**. `DENCH_HOST` can
-override the default `https://dench.com` backend. `DENCH_SESSION_KEY` optionally
-names a stable long-lived agent. `DENCH_AGENT_SESSION_TOKEN` and `DENCH_API_KEY`
-are credentials for provisioned environments; they are not required by these
-manifests. Never print or commit them. See the [CLI skill](skills/dench-cli/SKILL.md)
-for selection and safety rules.
+## Privacy and support
 
-## MCP authorization and limitations
+The plugin sends the tool inputs your agent chooses to Dench and returns
+workspace data to your client. Connected-app actions can send data to those
+apps. The plugin adds no telemetry. See the
+[Dench privacy policy](https://www.dench.com/privacy).
 
-- Endpoint: `https://mcp.dench.com/mcp`; transport: **Streamable HTTP**.
-- OAuth 2.1: DCR + CIMD, PKCE S256, rotating refresh tokens. Let clients discover
-  metadata; no shared client secret or hard-coded bearer header is needed.
-- `dench:read`: workspace context and rules, CRM records and metadata,
-  notes/activity, tasks, memory search, approval reads, and knowledge search.
-- `dench:write`: create/update records, add notes, create/complete tasks, save
-  memory, replace workspace rules, and request approvals.
-- `dench:actions`: discover connected apps and run their actions.
-- `dench:outreach`: opt-in campaign management, email sending, and inbox reads.
-  This scope is available only after a server release exposes it; Dench MCP
-  PR #1273 is adding the scope.
-- `dench:read` is required; `dench:write`, `dench:actions`, and
-  `dench:outreach` are optional consent choices. Inspect the live `tools/list`
-  response and each tool's live input schema to determine the capabilities
-  granted by the current server release. There are no delete or
-  approval-decision tools.
-- The grant is bound to one workspace. CLI sign-in does not grant MCP access and
-  vice versa. Neither should bypass the other's consent.
-- **Writes can change live CRM data without a separate human-approval gate.**
-  Workspace rules are replaced, not appended. External actions preserve Dench's
-  approval policy. Start read-only and review intended changes.
-- Before sending email or launching a campaign, obtain explicit user approval
-  for the exact senders, recipients, and content. Read the live launch preview
-  before launching. Never fabricate a required LinkedIn risk acknowledgement;
-  obtain the actual human acknowledgement when required.
-- Revoke a grant in **Dench → Settings → API keys → Connected AI apps**. Removing
-  a plugin or disconnecting a client may not revoke its server-side grant.
+Support: [support@dench.com](mailto:support@dench.com)
 
-## Privacy, support, and release checklist
-
-The client sends selected tool inputs to Dench and receives workspace data; its
-model provider may process that returned data under the client's own policies.
-Connected-app actions can send data to third-party services. These manifests
-add no telemetry or credential collection, but they do not replace Dench's or
-the client's privacy terms.
-
-- TODO: approved privacy policy URL, terms URL, support contact/channel, and
-  security reporting contact. Until supplied, contact your Dench administrator;
-  no guessed addresses or policy links are included.
-- TODO: client-specific logo variants/size exports, screenshots, listing copy,
-  and reviewer test account. The approved base workspace icon is linked above.
-- TODO: approved Codex plugin interface metadata, including display copy, icons,
-  and privacy/terms URLs required by the official spec. This is separate from
-  the catalog's root `interface.displayName`.
-- Cursor's public marketplace requires an open-source plugin, so public listing
-  is blocked while this repository is private. Continue to use only approved
-  local/private-team installs; do not change repository visibility.
-- TODO: merge/deploy the MCP server, configure DNS/TLS, and verify OAuth discovery,
-  consent, refresh, revocation, narrowed scopes, and approval-gated actions with
-  each target client, including the desktop catalog acceptance test in
-  [docs/formats.md](docs/formats.md).
-- TODO: Mark's explicit authorization before any public release, repository
-  visibility change, or directory submission. Do not publish this preview.
-
-## Development and validation
+## Development
 
 ```sh
 node scripts/validate.mjs
 git diff --check
-claude plugin validate .
-claude plugin validate .claude-plugin/marketplace.json
 ```
 
-The first command is dependency-free repository consistency validation, **not**
-an official cross-client schema validator. CI runs it plus a whitespace check;
-running the script with Node also parses its JavaScript. The Claude commands
-require Claude Code. Official format
-sources, schema validation instructions, and validation boundaries are in
-[docs/formats.md](docs/formats.md). There is no compiled application or TypeScript
-build. Live OAuth/client acceptance testing remains a release prerequisite.
+Manifests for each client live in `.cursor-plugin/`, `.claude-plugin/`,
+`.codex-plugin/`, `.agents/plugins/`, and `gemini-extension.json`; they share
+`skills/` and `.mcp.json`. Format sources and validation notes are in
+[docs/formats.md](docs/formats.md).
 
 ## License
 
-[MIT](LICENSE) applies to the contents of this repository, not to the Dench
-service or the private dench.com source. License choice does not authorize making
-this repository public.
+[MIT](LICENSE). The license covers this repository, not the Dench service.
